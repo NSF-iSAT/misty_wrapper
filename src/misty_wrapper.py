@@ -10,16 +10,21 @@ class MistyROSNode:
 
         rospy.init_node('mistyROS', anonymous=True, log_level=rospy.DEBUG)
         self.head_sub = rospy.Subscriber("mistyROS/move_head", Float32MultiArray, self.head_cb) 
+        self.led_sub = rospy.Subscriber("mistyROS/led", Float32MultiArray, self.led_cb)
 
         rospy.spin()
 
     def head_cb(self, msg):
         # NOTE: Currently using raw roll/pitch/yaw format. The transformations.py pkg has
         # utlities for conversion to/from quaternions<->euler rpy if this is needed.
-        # Also consider stamping header info onto 
-        rospy.debuginfo("received cb to move head with RPY value %f, %f, %f", msg[0], msg[1], msg[2])
+        rospy.logdebug("received cb to move head with RPY value %f, %f, %f", msg.data[0], msg.data[1], msg.data[2])
         if self.robot:
-            self.robot.moveHead(*msg)
+            self.robot.moveHead(*(msg.data))
+    
+    def led_cb(self, msg):
+        rospy.logdebug("received cb to change led with RGB value %f, %f, %f", msg.data[0], msg.data[1], msg.data[2])
+        if self.robot:
+            self.robot.changeLED(*(msg.data))
 
 if __name__ == "__main__":
     try:
