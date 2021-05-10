@@ -37,7 +37,7 @@ def make_camera_info_message(stamp, frame_id, image_width, image_height, cx, cy,
 class MistyNode:
     def __init__(self, idx=0, ip=None):
         self.ip = ip
-        if rospy.get_param("use_robot") == True:
+        if rospy.get_param("/mistyROS/use_robot") == True:
             assert ip is not None, "Node failed to launch in use_robot mode; provide a valid Misty IP"
             self.robot = mistyPy.Robot(ip)
 
@@ -48,6 +48,8 @@ class MistyNode:
         self.caminfo_pub = rospy.Publisher("misty/id_" + str(idx) + "/camera_info", CameraInfo, queue_size=10)
 
         rospy.init_node("misty_" + str(idx), anonymous=False)
+
+        self._setup_av_streaming()
 
         while not rospy.is_shutdown():
             # loop: do something with current cam stream, publish frames, etc.
@@ -62,6 +64,12 @@ class MistyNode:
         self.vid_stream     = VidStreamer(url)
         self.audio_stream   = AudioStreamer(url)
 
+    def vid_cb(self):
+        latest_frame = self.vid_stream.frame
+        
+
     def cleanup(self):
         self.vid_stream.stop()
         self.robot.stopAvStream()
+
+MistyNode(ip="192.168.50.155")

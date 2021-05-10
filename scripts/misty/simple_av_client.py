@@ -42,6 +42,7 @@ class VidStreamer:
 class AudioStreamer:
     def __init__(self, path):
         self.stream_path = path
+        self.stopped = False
 
     def start(self):
         t = Thread(target=self.update, args=())
@@ -58,7 +59,7 @@ class AudioStreamer:
                             channels=1,
                             rate=11025,
                             output=True)
-            while True:
+            while not self.stopped:
                 if len(queue) == 0:
                     time.sleep(0.25)
                     continue

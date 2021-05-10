@@ -1,6 +1,6 @@
 <launch>
-    <node pkg="isat_robot_control" type="misty_wrapper.py" name="mistyROS">
-        <param name="use_robot" type="bool" value="false" />
+    <node pkg="isat_robot_control" type="misty_ROS.py" name="mistyROS">
+        <param name="use_robot" type="bool" value="true" />
     </node>
 
 </launch>
