@@ -38,38 +38,45 @@ class MistyNode:
     def __init__(self, idx=0, ip=None):
         self.ip = ip
         if rospy.get_param("/mistyROS/use_robot") == True:
-            assert ip is not None, "Node failed to launch in use_robot mode; provide a valid Misty IP"
-            self.robot = mistyPy.Robot(ip)
+            if ip is None:
+                self.ip = rospy.get_param("/mistyROS/robot_ip")
+            assert self.ip, "Node failed to launch in use_robot mode; provide a valid Misty IP"
+            print('IP: ', self.ip)
+            self.robot = mistyPy.Robot(self.ip)
+            self._setup_av_streaming()
 
         self.bridge = CvBridge()
-        self._setup_av_streaming()
 
         self.cam_pub = rospy.Publisher("/misty/id_" + str(idx) + "/camera", Image, queue_size=10)
         self.caminfo_pub = rospy.Publisher("misty/id_" + str(idx) + "/camera_info", CameraInfo, queue_size=10)
+        # self.caminfo_msg = make_camera_info_message()
 
         rospy.init_node("misty_" + str(idx), anonymous=False)
 
-        self._setup_av_streaming()
-
         while not rospy.is_shutdown():
             # loop: do something with current cam stream, publish frames, etc.
-            pass
+            latest_frame = self.vid_cb()
+            if latest_frame:
+                img_msg = self.bridge.cv2_to_imgmsg(latest_frame, encoding="passthrough")
+                self.cam_pub.publish(img_msg)
+            # self.caminfo_pub
+            # pass
 
         self.cleanup()
 
     def _setup_av_streaming(self, port_no="1935"):
-        url = "rtsp://" + self.ip + "/" + port_no
-        self.robot.startAvStream(url, dimensions=(640, 480))
+        url = "rtsp://" + self.ip + ":" + port_no
+        self.robot.startAvStream("rtspd:" + port_no, dimensions=(640, 480))
 
         self.vid_stream     = VidStreamer(url)
         self.audio_stream   = AudioStreamer(url)
 
     def vid_cb(self):
         latest_frame = self.vid_stream.frame
-        
+        return latest_frame
 
     def cleanup(self):
         self.vid_stream.stop()
         self.robot.stopAvStream()
 
-MistyNode(ip="192.168.50.155")
+MistyNode()
