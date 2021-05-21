@@ -7,6 +7,7 @@ from cv_bridge import CvBridge
 from std_msgs.msg import String, Int32MultiArray
 from sensor_msgs.msg import Image, CameraInfo
 
+from isat_robot_control.msg import MoveArm, MoveArms, MoveHead
 from simple_av_client import VidStreamer, AudioStreamer
 
 def make_camera_info_message(stamp, frame_id, image_width, image_height, cx, cy, fx, fy):
@@ -43,40 +44,63 @@ class MistyNode:
             assert self.ip, "Node failed to launch in use_robot mode; provide a valid Misty IP"
             print('IP: ', self.ip)
             self.robot = mistyPy.Robot(self.ip)
-            self._setup_av_streaming()
 
-        self.bridge = CvBridge()
+            # NOTE as of 5/21/21 AV streaming still in development
+            # self._setup_av_streaming()
+            # TODO move to separate node
 
+        # self.bridge = CvBridge()
+
+        # PUBLICATIONS
         self.cam_pub = rospy.Publisher("/misty/id_" + str(idx) + "/camera", Image, queue_size=10)
         self.caminfo_pub = rospy.Publisher("misty/id_" + str(idx) + "/camera_info", CameraInfo, queue_size=10)
         # self.caminfo_msg = make_camera_info_message()
 
+        # SUBSCRIPTIONS
+        self.speech_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/speech", String, self.speech_cb)
+        self.arms_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/arms", MoveArms, self.arms_cb)
+        self.head_usb = rospy.Subscriber("/misty/id_" + str(idx) + "/head", MoveHead, self.head_cb)
+
         rospy.init_node("misty_" + str(idx), anonymous=False)
 
-        while not rospy.is_shutdown():
-            # loop: do something with current cam stream, publish frames, etc.
-            latest_frame = self.vid_cb()
-            if latest_frame:
-                img_msg = self.bridge.cv2_to_imgmsg(latest_frame, encoding="passthrough")
-                self.cam_pub.publish(img_msg)
-            # self.caminfo_pub
-            # pass
+        # while not rospy.is_shutdown():
+        #     # loop: do something with current cam stream, publish frames, etc.
+        #     latest_frame = self.vid_cb()
+        #     if latest_frame:
+        #         img_msg = self.bridge.cv2_to_imgmsg(latest_frame, encoding="passthrough")
+        #         self.cam_pub.publish(img_msg)
+        rospy.spin()
 
         self.cleanup()
 
     def _setup_av_streaming(self, port_no="1935"):
+        # TODO FIX
         url = "rtsp://" + self.ip + ":" + port_no
         self.robot.startAvStream("rtspd:" + port_no, dimensions=(640, 480))
 
         self.vid_stream     = VidStreamer(url)
-        self.audio_stream   = AudioStreamer(url)
+        # self.audio_stream   = AudioStreamer(url)
 
     def vid_cb(self):
         latest_frame = self.vid_stream.frame
         return latest_frame
 
+    def speech_cb(self, msg):
+        self.robot.speak(msg.data)
+
+    def arms_cb(self, msg):
+        left_arm_msg = msg.leftArm
+        right_arm_msg = msg.rightArm
+
+        self.robot.moveArms(right_arm_msg.value, left_arm_msg.value, right_arm_msg.velocity, left_arm_msg.velocity, 
+            units=msg.units)
+
+    def head_cb(self, msg):
+        self.robot.moveHead(msg.roll, msg.pitch, msg.yaw, msg.velocity, units=msg.units)
+
     def cleanup(self):
-        self.vid_stream.stop()
-        self.robot.stopAvStream()
+        # self.vid_stream.stop()
+        # self.robot.stopAvStream()
+        pass
 
 MistyNode()
