@@ -375,7 +375,7 @@ class Robot:
             "RequireKeyPhrase": require_key_phrase,
             "OverwriteExisting": overwrite_existing,
             "MaxSpeechLength" : max_length,
-            "SilenceTimeout": silence_timout
+            "SilenceTimeout": silence_timeout
         }
         return requests.post("http://" + self.ip + "/api/audio/speech/capture", json=json)
     

@@ -1,10 +1,17 @@
 <launch>
-    <arg name="use_robot" default="false"/>
-    <arg name="robot_ip" default=""/>
+    <arg name="use_robot" default="true"/>
+    <arg name="robot_ip" default="192.168.50.154"/>
+    <arg name="use_av_stream" default="true"/>
 
-    <node pkg="isat_robot_control" type="misty_ROS.py" name="mistyROS">
+    <node pkg="isat_robot_control" type="misty_ROS.py" name="misty_ROS">
         <param name="use_robot" type="bool" value="$(arg use_robot)" />
         <param name="robot_ip" type="string" value="$(arg robot_ip)"/>
     </node>
+
+    <group if="$(arg use_av_stream)">
+        <node pkg="isat_robot_control" type="misty_AV.py" name="misty_AV">
+            <param name="robot_ip" type="string" value="$(arg robot_ip)"/>
+        </node>
+    </group>
 
 </launch>
