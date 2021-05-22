@@ -9,14 +9,14 @@ from std_msgs.msg import String, Int32MultiArray
 from sensor_msgs.msg import Image, CameraInfo
 
 import mistyPy
-from simple_av_client import VidStreamer, AudioStreamer
+from simple_av_client import VidStreamer
 
 class MistyAVNode:
     def __init__(self, idx=0):
         self.ip = rospy.get_param("/misty_ROS/robot_ip")
 
         self.cam_pub = rospy.Publisher("/misty/id_" + str(idx) + "/camera", Image, queue_size=10)
-        # self.caminfo_pub = rospy.Publisher("misty/id_" + str(idx) + "/camera_info", CameraInfo, queue_size=10)
+        self.caminfo_pub = rospy.Publisher("misty/id_" + str(idx) + "/camera_info", CameraInfo, queue_size=10)
     
         self.robot = mistyPy.Robot(self.ip)
         self.M_rotation = None
@@ -40,7 +40,6 @@ class MistyAVNode:
         self.robot.startAvStream("rtspd:" + port_no, dimensions=(640, 480))
         rospy.sleep(2)
         self.vid_stream     = VidStreamer(url).start()
-        # self.audio_stream   = AudioStreamer(url)
 
     def video_cb(self):
         frame = self.vid_stream.frame
