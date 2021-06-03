@@ -53,6 +53,7 @@ add_message_files(
    MoveArm.msg
    MoveArms.msg
    MoveHead.msg
+   DetectedFace.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -164,6 +165,8 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/misty/misty_ROS.py
   scripts/misty/misty_AV.py
+  scripts/misty/misty_find_ip_ros.py
+  scripts/misty/demo.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -192,6 +195,7 @@ catkin_install_python(PROGRAMS
 install(FILES
   # myfile1
   launch/misty.launch
+  launch/demo.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 

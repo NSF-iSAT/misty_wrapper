@@ -1,7 +1,13 @@
+#!/usr/bin/env python3
+
 """SOURCE: CPsridharCP on github. https://github.com/CPsridharCP/MistySkills/blob/master/Apps/Teleop/02_pythonTeleop/findMisty.py"""
+from gevent import monkey
+monkey.patch_all()
+
 
 import socket
 import grequests
+import requests
 import json
 import PySimpleGUI as sg
 import pyperclip
@@ -117,7 +123,7 @@ def initial_ip_scan_window():
 
         # START SCAN FOR MISTY
         if event == "SCAN":
-            print("Staring scan for Misty")
+            print("Starting scan for Misty")
             scanning_in_progress = True
             window["STATUS"].update("Scanning in Progress. Please wait.. May take up to 15 seconds")
             window["SCAN"].update(disabled = True)
