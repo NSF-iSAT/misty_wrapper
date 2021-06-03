@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import rospy
 
-
-import mistyPy
+from misty_wrapper import mistyPy
 from std_msgs.msg import String, Int8MultiArray
-from isat_robot_control.msg import MoveArms, MoveHead
+from misty_wrapper.msg import MoveArms, MoveHead
 
 class MistyNode:
     def __init__(self, idx=0, ip=None):

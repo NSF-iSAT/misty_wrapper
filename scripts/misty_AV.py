@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 import rospy
-
-# from cv_bridge import CvBridge
-from py3_cv_bridge import cv2_to_imgmsg
 import imutils
 from std_msgs.msg import String
 from sensor_msgs.msg import Image, CameraInfo
 
-import mistyPy
-from simple_av_client import VidStreamer
-from isat_robot_control.msg import DetectedFace
+from misty_wrapper.py3_cv_bridge import cv2_to_imgmsg
+from misty_wrapper import mistyPy
+from misty_wrapper.simple_av_client import VidStreamer
+from misty_wrapper.msg import DetectedFace
 
 
 class MistyAVNode:
@@ -18,7 +16,7 @@ class MistyAVNode:
         while not self.ip:
             self.ip = rospy.get_param("/misty/id_" + str(idx) + "/robot_ip")
             rospy.sleep(1.0)
-        self.stream_res = tuple(rospy.get_param("~stream_resolution"))
+        self.stream_res = (rospy.get_param("/misty_AV_" + str(idx) + "/stream_resolution/W"), rospy.get_param("/misty_AV_" + str(idx) + "/stream_resolution/H"))
 
         self.learn_face_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/learn_face", String, self.learn_face_cb)
 

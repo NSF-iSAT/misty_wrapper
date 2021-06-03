@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(isat_robot_control)
+project(misty_wrapper)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -21,7 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -163,10 +163,10 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/misty/misty_ROS.py
-  scripts/misty/misty_AV.py
-  scripts/misty/misty_find_ip_ros.py
-  scripts/misty/demo.py
+  scripts/misty_ROS.py
+  scripts/misty_AV.py
+  scripts/misty_find_ip_ros.py
+  scripts/demo.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -195,7 +195,6 @@ catkin_install_python(PROGRAMS
 install(FILES
   # myfile1
   launch/misty.launch
-  launch/demo.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 

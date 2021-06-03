@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import rospy
-from misty_scan import *
+from misty_wrapper.misty_scan import *
 
 if __name__ == "__main__":
     # idx = rospy.get_param(rospy.get_name() + "/robot_id")
