@@ -6,6 +6,10 @@ from std_msgs.msg import String, Int8MultiArray
 from misty_wrapper.msg import MoveArms, MoveHead
 
 class MistyNode:
+    """
+    Recieve and execute motor and display commands to Misty.
+    """
+
     def __init__(self, idx=0, ip=None):
         self.ip = ip
         if rospy.get_param("/misty_ROS_"+ str(idx) + "/use_robot") == True:
@@ -13,9 +17,7 @@ class MistyNode:
                 while not self.ip:
                     self.ip = rospy.get_param("/misty/id_" + str(idx) + "/robot_ip")
                     rospy.sleep(1.0)
-            print('IP: ', self.ip)
             self.robot = mistyPy.Robot(self.ip)
-
 
         # SUBSCRIPTIONS
         self.speech_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/speech", String, self.speech_cb)
