@@ -320,7 +320,7 @@ class Robot:
                 if self.face_recognition_instance is None:
                     self.startFaceRecognition()
                     print("FaceRecStarted")
-                    self.face_recognition_instance = Socket(self.ip,Type,_value="ComputerVision", _debounce = debounce)
+                    self.face_recognition_instance = Socket(self.ip,Type,_value="FaceRecognition", _debounce = debounce)
                 
         else:
             print(" subscribe: Type name - ",Type,"is not recognized by the robot, use <robot_name>.printSubscriptionList() to see the list of possible Type names")
@@ -486,6 +486,7 @@ class Socket:
     def on_close(self,ws):
         ws.send(str(self.get_unsubscribe_message(self.Type)))
         self.data = "{\"status\":\"Not_Subscribed or just waiting for data\"}"
+        ws.close()
         print("###",self.Type," socket is closed ###")
 
     def on_open(self,ws):

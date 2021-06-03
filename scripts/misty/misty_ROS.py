@@ -1,20 +1,19 @@
-#!/usr/bin/env python
-import websocket
+#!/usr/bin/env python3
 import rospy
 
-from std_msgs.msg import String, Int32MultiArray
-from sensor_msgs.msg import Image, CameraInfo
 
 import mistyPy
+from std_msgs.msg import String, Int8MultiArray
 from isat_robot_control.msg import MoveArms, MoveHead
 
 class MistyNode:
     def __init__(self, idx=0, ip=None):
         self.ip = ip
-        if rospy.get_param("/misty_ROS/use_robot") == True:
+        if rospy.get_param("/misty_ROS_"+ str(idx) + "/use_robot") == True:
             if ip is None:
-                self.ip = rospy.get_param("/misty_ROS/robot_ip")
-            assert self.ip, "Node failed to launch in use_robot mode; provide a valid Misty IP"
+                while not self.ip:
+                    self.ip = rospy.get_param("/misty/id_" + str(idx) + "/robot_ip")
+                    rospy.sleep(1.0)
             print('IP: ', self.ip)
             self.robot = mistyPy.Robot(self.ip)
 
@@ -22,24 +21,21 @@ class MistyNode:
         # SUBSCRIPTIONS
         self.speech_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/speech", String, self.speech_cb)
         self.arms_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/arms", MoveArms, self.arms_cb)
-        self.head_usb = rospy.Subscriber("/misty/id_" + str(idx) + "/head", MoveHead, self.head_cb)
+        self.head_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/head", MoveHead, self.head_cb)
+        self.face_img_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/face_img", String, self.face_img_cb)
+        self.led_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/led", Int8MultiArray, self.led_cb )
 
         rospy.init_node("misty_" + str(idx), anonymous=False)
-
-        # while not rospy.is_shutdown():
-        #     # loop: do something with current cam stream, publish frames, etc.
-        #     latest_frame = self.vid_cb()
-        #     if latest_frame:
-        #         img_msg = self.bridge.cv2_to_imgmsg(latest_frame, encoding="passthrough")
-        #         self.cam_pub.publish(img_msg)
         rospy.spin()
 
         self.cleanup()
 
+    def led_cb(self, msg):
+        r, g, b = msg.data
+        self.robot.changeLED(r, g, b)
 
-    def vid_cb(self):
-        latest_frame = self.vid_stream.frame
-        return latest_frame
+    def face_img_cb(self, msg):
+        self.robot.changeImage(msg.data)
 
     def speech_cb(self, msg):
         self.robot.speak(msg.data)

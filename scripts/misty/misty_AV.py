@@ -1,45 +1,64 @@
 #!/usr/bin/env python3
-import websocket
 import rospy
 
 # from cv_bridge import CvBridge
 from py3_cv_bridge import cv2_to_imgmsg
 import imutils
-from std_msgs.msg import String, Int32MultiArray
+from std_msgs.msg import String
 from sensor_msgs.msg import Image, CameraInfo
 
 import mistyPy
 from simple_av_client import VidStreamer
+from isat_robot_control.msg import DetectedFace
+
 
 class MistyAVNode:
     def __init__(self, idx=0):
-        self.ip = rospy.get_param("/misty_ROS/robot_ip")
+        self.ip = ""
+        while not self.ip:
+            self.ip = rospy.get_param("/misty/id_" + str(idx) + "/robot_ip")
+            rospy.sleep(1.0)
+        self.stream_res = tuple(rospy.get_param("~stream_resolution"))
+
+        self.learn_face_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/learn_face", String, self.learn_face_cb)
 
         self.cam_pub = rospy.Publisher("/misty/id_" + str(idx) + "/camera", Image, queue_size=10)
         self.caminfo_pub = rospy.Publisher("misty/id_" + str(idx) + "/camera_info", CameraInfo, queue_size=10)
+        self.face_pub = rospy.Publisher("/misty/id_" + str(idx) + "/face_recognition", DetectedFace, queue_size=2)
     
         self.robot = mistyPy.Robot(self.ip)
         self.M_rotation = None
         # self.bridge = CvBridge()
         rospy.init_node("misty_AV_" + str(idx), anonymous=False)
 
-        self._setup()
+        self._av_setup()
+        self._face_setup()
 
         while not rospy.is_shutdown():
             self.video_cb()
-            # rospy.sleep(0.1)
+            # TODO debug: self.face_cb()
+            self.face_cb()
+            rospy.sleep(0.01)
 
         self._cleanup()
 
     def _cleanup(self):
         self.vid_stream.stop()
+        print("stopped streaming video")
         self.robot.stopAvStream()
+        print("stopped misty av stream")
+        self.robot.unsubscribe("FaceRecognition")
+        print("unsubscribed from facerec")
 
-    def _setup(self, port_no="1935"):
+    def _av_setup(self, port_no="1935"):
         url = "rtsp://" + self.ip + ":" + port_no
-        self.robot.startAvStream("rtspd:" + port_no, dimensions=(640, 480))
+        self.robot.startAvStream("rtspd:" + port_no, dimensions=self.stream_res)
         rospy.sleep(2)
         self.vid_stream     = VidStreamer(url).start()
+
+    def _face_setup(self):
+        # self.robot.startFaceRecognition()
+        self.robot.subscribe("FaceRecognition")
 
     def video_cb(self):
         frame = self.vid_stream.frame
@@ -49,6 +68,21 @@ class MistyAVNode:
         frame = imutils.rotate_bound(frame, 90)
         img_msg = cv2_to_imgmsg(frame)
         self.cam_pub.publish(img_msg)
+
+    def face_cb(self):
+        # print("facerec callback")
+        data = self.robot.faceRec()
+        # TODO publish data
+        try:
+            msg = DetectedFace({"name": data["personName"], "distance" : data["distance"],
+            "elevation" : data["elevation"]})
+        except KeyError:
+            return
+        self.face_pub.publish(msg)
+        # print(data)
+
+    def learn_face_cb(self, name):
+        self.robot.learnFace(name)
 
 if __name__ == "__main__":
     MistyAVNode()
