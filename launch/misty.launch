@@ -1,17 +1,41 @@
 <launch>
     <arg name="use_robot" default="true"/>
-    <arg name="robot_ip" default="192.168.50.154"/>
-    <arg name="use_av_stream" default="true"/>
+    <!-- <arg name="robot_ip" default=""/> -->
 
-    <node pkg="isat_robot_control" type="misty_ROS.py" name="misty_ROS">
+    <!-- for demo'ing -->
+    <arg name="robot_ip" value="192.168.50.155"/>
+    
+    <arg name="robot_id" default="0"/>
+    <arg name="robot_ip_is_set" value="$(eval false if (arg('robot_ip') == '') else true)"/>
+    <arg name="use_av_stream" default="true"/>
+    <arg name="demo_mode" default="false"/>
+    
+    <param name="/misty/id_$(arg robot_id)/robot_ip" type="string" value="$(arg robot_ip)"/>
+
+    <group unless="$(arg robot_ip_is_set)">
+        <node pkg="isat_robot_control" type="misty_find_ip_ros.py" name="misty_find_ip_ros_$(arg robot_id)">
+            <param name="robot_id" value="$(arg robot_id)"/>
+        </node>
+    </group>
+
+    <node pkg="isat_robot_control" type="misty_ROS.py" name="misty_ROS_$(arg robot_id)">
         <param name="use_robot" type="bool" value="$(arg use_robot)" />
-        <param name="robot_ip" type="string" value="$(arg robot_ip)"/>
     </node>
 
     <group if="$(arg use_av_stream)">
-        <node pkg="isat_robot_control" type="misty_AV.py" name="misty_AV">
-            <param name="robot_ip" type="string" value="$(arg robot_ip)"/>
+        <node pkg="isat_robot_control" type="misty_AV.py" name="misty_AV_$(arg robot_id)">
+            <rosparam param="stream_resolution">[640, 480]</rosparam>
+        </node>
+        <node name="image_view_misty_$(arg robot_id)" pkg="image_view" type="image_view" respawn="false" output="log">
+            <remap from="image" to="/misty/id_$(arg robot_id)/camera"/>
+            <param name="autosize" value="true" />
         </node>
     </group>
+
+    <group if="$(arg demo_mode)">
+        <node pkg="isat_robot_control" type="demo.py" name="misty_demo_$(arg robot_id)"/>
+    </group>
+
+
 
 </launch>
