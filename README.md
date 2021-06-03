@@ -12,7 +12,7 @@ source isat_venv/bin/activate
 pip install -r [location_of_this_package]/requirements.txt
 ```
 #### Launch
-`roslaunch misty.launch robot_ip:=None robot_id:=0 use_av_stream:=true`
+`roslaunch misty_wrapper misty.launch robot_ip:=None robot_id:=0 use_av_stream:=true`
 
 ### Nodes
 
