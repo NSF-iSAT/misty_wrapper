@@ -39,16 +39,54 @@ class VidStreamer:
         self.stopped = True
 
 
-def test_streaming():
-    # v = VidStreamer("rtsp://192.168.50.154:1935").start()
-    # cv2.namedWindow("demo", cv2.WINDOW_AUTOSIZE)
-    # while True:
-    #     img = v.frame
-    #     cv2.imshow('demo', img)
-    #     cv2.waitKey(10)
+import av
+# import numpy as np
+# from threading import Thread
+import pyaudio
+from collections import deque
+import time
 
-    # # cv2.destroyAllWindows()
-    pass
+
+class AudioPlayer:
+
+    def __init__(self, path):
+        self.stream_path = path
+
+
+    def update(self):
+        queue = deque()
+
+        def play_thread():
+            p = pyaudio.PyAudio()
+            stream = p.open(format=pyaudio.paFloat32,
+                            channels=1,
+                            rate=11025,
+                            output=True)
+            while True:
+                if len(queue) == 0:
+                    time.sleep(0.25)
+                    continue
+                frame = queue.popleft()
+                stream.write(frame.to_ndarray().astype(np.float32).tostring())
+
+        t = Thread(target=play_thread)
+        t.start()  
+
+        container = av.open(self.stream_path)
+        input_stream = container.streams.get(audio=0)[0]
+        for frame in container.decode(input_stream):
+            frame.pts = None
+            queue.append(frame)
+
+    def start(self):
+
+        t = Thread(target=self.update, args=())
+        t.daemon = True
+        t.start()
+
+    # def stop(self):
+    #     self.stopped = True
+
 
 if __name__ == "__main__":
-    test_streaming()
+    AudioPlayer("rtsp://192.168.50.156:1935").start()

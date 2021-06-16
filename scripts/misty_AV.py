@@ -6,7 +6,7 @@ from sensor_msgs.msg import Image, CameraInfo
 
 from misty_wrapper.py3_cv_bridge import cv2_to_imgmsg # workaround for cv_bridge incompatibility with Python 3
 from misty_wrapper import mistyPy
-from misty_wrapper.simple_av_client import VidStreamer
+from misty_wrapper.simple_av_client import VidStreamer, AudioPlayer
 from misty_wrapper.msg import DetectedFace
 
 
@@ -57,6 +57,7 @@ class MistyAVNode:
         self.robot.startAvStream("rtspd:" + port_no, dimensions=self.stream_res)
         rospy.sleep(2)
         self.vid_stream     = VidStreamer(url).start()
+        AudioPlayer(url).start()
 
     def _face_setup(self):
         self.robot.subscribe("FaceRecognition")
