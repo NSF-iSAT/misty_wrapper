@@ -7,6 +7,8 @@ This is a ROS wrapper for the Misty II robot. It uses an expanded version of Mis
 #### Recommended first-time setup:
 ```
 cd [your_ROS_workspace]
+catkin_make
+source devel/setup.bash
 python3 -m venv isat_venv
 source isat_venv/bin/activate
 pip install -r [location_of_this_package]/requirements.txt
