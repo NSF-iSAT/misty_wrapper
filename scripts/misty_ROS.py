@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rospy
+from mistyPy.Robot import Robot
 
-from misty_wrapper import mistyPy
 from std_msgs.msg import String, Int8MultiArray
 from misty_wrapper.msg import MoveArms, MoveHead
 
@@ -17,7 +17,7 @@ class MistyNode:
                 while not self.ip:
                     self.ip = rospy.get_param("/misty/id_" + str(idx) + "/robot_ip")
                     rospy.sleep(1.0)
-            self.robot = mistyPy.Robot(self.ip)
+            self.robot = Robot(self.ip)
 
         # SUBSCRIPTIONS
         self.speech_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/speech", String, self.speech_cb)
@@ -29,31 +29,25 @@ class MistyNode:
         rospy.init_node("misty_" + str(idx), anonymous=False)
         rospy.spin()
 
-        self.cleanup()
-
     def led_cb(self, msg):
         r, g, b = msg.data
-        self.robot.changeLED(r, g, b)
+        self.robot.ChangeLED(r, g, b)
 
     def face_img_cb(self, msg):
-        self.robot.changeImage(msg.data)
+        self.robot.DisplayImage(msg.data)
 
     def speech_cb(self, msg):
-        self.robot.speak(msg.data)
+        self.robot.Speak(msg.data)
 
     def arms_cb(self, msg):
         left_arm_msg = msg.leftArm
         right_arm_msg = msg.rightArm
 
-        self.robot.moveArms(right_arm_msg.value, left_arm_msg.value, right_arm_msg.velocity, left_arm_msg.velocity, 
+        self.robot.MoveArms(left_arm_msg.value, right_arm_msg.value,  left_arm_msg.velocity, right_arm_msg.velocity, 
             units=msg.units)
 
     def head_cb(self, msg):
-        self.robot.moveHead(msg.roll, msg.pitch, msg.yaw, msg.velocity, units=msg.units)
+        self.robot.MoveHead(msg.pitch, msg.roll, msg.yaw, msg.velocity, units=msg.units)
 
-    def cleanup(self):
-        # self.vid_stream.stop()
-        # self.robot.stopAvStream()
-        pass
 
 MistyNode()
