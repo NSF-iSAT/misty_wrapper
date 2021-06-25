@@ -4,9 +4,9 @@
 This is a ROS wrapper for the Misty II robot. It uses an expanded version of Misty Robotics's python wrapper to communicate with the Misty via local wireless. It is designed to allow multiple Mistys to be controlled via the same ROS server by specifying topics and nodes by id number (this requires launching misty.launch with appropriate arguments for each Misty).  
 
 ### Requirements
-ROS melodic
-python >3.8.0
-ffmpeg >4.0.0
+* ROS melodic
+* python >3.8.0
+* ffmpeg >4.0.0
 
 ### Usage
 #### Recommended first-time setup:
