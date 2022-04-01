@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import rospy
-from mistyPy.Robot import Robot
+from mistyPy import Robot
 
 from std_msgs.msg import String, Int8MultiArray
 from misty_wrapper.msg import MoveArms, MoveHead
