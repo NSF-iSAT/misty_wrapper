@@ -57,7 +57,7 @@ class MistyAVNode:
         # self.robot.EnableAvStreamingService()
         # self.robot.StartAvStreaming(url=url, width=w, height=h, frameRate=30, videoBitRate=5000000,
         #     audioBitRate=128000, audioSampleRateHz=44100)
-        print(self.robot.startAvStream(url=misty_stream_url).json()) # TODO switch to RTSPD
+        print(self.robot.startAvStream(url=misty_stream_url, dimensions=self.stream_res).json()) # TODO switch to RTSPD
         rospy.sleep(2)
         self.vid_stream     = VidStreamer(url).start()
         # AudioPlayer(url).start()

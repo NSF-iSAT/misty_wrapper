@@ -47,7 +47,7 @@ class MistyNode:
             units=msg.units)
 
     def head_cb(self, msg):
-        self.robot.MoveHead(msg.pitch, msg.roll, msg.yaw, msg.velocity, units=msg.units)
+        self.robot.MoveHead( roll=msg.roll, pitch=msg.pitch, yaw=msg.yaw, velocity=msg.velocity, units=msg.units, duration=msg.duration)
 
 
 MistyNode()

@@ -44,11 +44,11 @@ class Robot:
         self.valid_video_resolutions = [(3840, 2160), (1920, 1080), (1280, 960), (640, 480), (320, 240)]
         self.valid_stream_resolutions = [(1920, 1280), (1280, 960), (640, 480), (320, 240)]
 
-    def changeLED(self,red,green,blue):
-        assert red in range(0,256) and blue in range(0,256) and green in range(0,256), " changeLED: The colors need to be in 0-255 range"
+    def ChangeLED(self,red,green,blue):
+        assert red in range(0,256) and blue in range(0,256) and green in range(0,256), " ChangeLED: The colors need to be in 0-255 range"
         requests.post('http://'+self.ip+'/api/led',json={"red": red,"green": green,"blue": blue})
 
-    def changeImage(self,image_name,timeout=5):
+    def DisplayImage(self,image_name,timeout=5):
         if image_name in self.images_saved:
             requests.post('http://' + self.ip + '/api/images/display',json={'FileName': image_name ,'TimeOutSeconds': 5,'Alpha': 1})
         else:
@@ -72,17 +72,20 @@ class Robot:
         for reply in resp.json():
             return (reply['result'])
 
-    def moveHead(self,roll,pitch,yaw,velocity=10, units="degrees"):
+    def MoveHead(self,roll,pitch,yaw,velocity=10, units="degrees", duration=None):
         if(units == "position"):
             assert -5.0 <= roll <= 5.0 and -5.0 <= pitch <= 5.0 and -5.0 <= yaw <= 5.0, " moveHead: Roll, Pitch and Yaw needs to be in range -5 to +5"
-        elif(units == "radians"):
+        elif(units == "radians"): # TODO fix these values
             assert -.75 <= roll <= .75 and -.1662 <= pitch <= .6094 and -1.57 <= yaw <= 1.57, " moveHead: invalid positioning"
         else:
             units = "degrees"
-            assert -9.5 <= pitch <= 34.9 and -43 <= roll <= 43 and -90 <= yaw <= 90, " moveHead: invalid positioning"
+            assert -40 <= pitch <= 26 and -40 <= roll <= 40 and -81 <= yaw <= 81, " moveHead: invalid positioning"
 
         assert 0.0 <= velocity <= 100.0, " moveHead: Velocity needs to be in range 0 to 100"
-        requests.post('http://'+self.ip+'/api/head',json={"Pitch": pitch, "Roll": roll, "Yaw": yaw, "Velocity": velocity, "Units": units})
+        json={"Pitch": pitch, "Roll": roll, "Yaw": yaw, "Velocity": velocity, "Units": units}
+        # if duration:
+        #     json["Duration"] = duration
+        requests.post('http://'+self.ip+'/api/head',json=json)
 
     def moveHeadPosition(self, pitch, roll, yaw, velocity):
         self.moveHead(pitch, roll, yaw, velocity, "position")
@@ -164,7 +167,7 @@ class Robot:
         requests.delete('http://'+self.ip+'/api/faces')
         self.faces_saved = []
 
-    def moveArm(self, arm, position, velocity, units = "degrees"):
+    def MoveArm(self, arm, position, velocity, units = "degrees"):
         arm = arm.lower()
         units = units.lower()
 
@@ -181,16 +184,16 @@ class Robot:
 
         requests.post('http://'+self.ip+'/api/arms', json={"Arm": arm, "Position": position, "Velocity": velocity, "Units": units})
 
-    def moveArmDegrees(self, arm, position, velocity):
-        self.moveArm(arm, position, velocity, "degrees")
+    def MoveArmDegrees(self, arm, position, velocity):
+        self.MoveArm(arm, position, velocity, "degrees")
 
-    def moveArmPosition(self, arm, position, velocity):
-        self.moveArm(arm, position, velocity, "postion")
+    def MoveArmPosition(self, arm, position, velocity):
+        self.MoveArm(arm, position, velocity, "postion")
     
-    def moveArmRadians(self, arm, position, velocity):
-        self.moveArm(arm, position, velocity, "radians")
+    def MoveArmRadians(self, arm, position, velocity):
+        self.MoveArm(arm, position, velocity, "radians")
 
-    def moveArms(self, rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity, units = "degrees"):
+    def MoveArms(self, rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity, units = "degrees"):
         units = units.lower()
 
         assert units == "degrees" or units == "radians" or units == "position", "Invalid unit. Please use 'degrees', 'radians', or 'position'"
@@ -205,14 +208,14 @@ class Robot:
 
         requests.post('http://' + self.ip + '/api/arms/set', json={"leftArmPosition": leftArmPosition, "rightArmPosition": rightArmPosition, "leftArmVelocity": leftArmVelocity, "rightArmVelocity": rightArmVelocity, "units": units})
 
-    def moveArmsDegrees(self, rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity):
-        self.moveArms(rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity, "degrees")
+    def MoveArmsDegrees(self, rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity):
+        self.MoveArms(rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity, "degrees")
     
-    def moveArmsPosition(self, rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity):
-        self.moveArms(rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity, "position")
+    def MoveArmsPosition(self, rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity):
+        self.MoveArms(rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity, "position")
     
-    def moveArmsRadians(self, rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity):
-        self.moveArms(rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity, "radians")
+    def MoveArmsRadians(self, rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity):
+        self.MoveArms(rightArmPosition, leftArmPosition, rightArmVelocity, leftArmVelocity, "radians")
 
     def learnFace(self,name):
         assert isinstance(name, str), " trainFace: name must be a string"
@@ -335,7 +338,7 @@ class Robot:
 
 # added
 
-    def speak(self, ssml_string, flush=False, uid=0):
+    def Speak(self, ssml_string, flush=False, uid=0):
         json = {
             "Text" : ssml_string,
             "Flush": flush,
