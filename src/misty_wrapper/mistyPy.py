@@ -357,7 +357,7 @@ class Robot:
         """
         NOTE: to use Misty as her own media server, use rtspd:<port-number>
         """
-        assert dimensions in self.valid_stream_resolutions, "Invalid stream resolution"
+        # assert dimensions in self.valid_stream_resolutions, "Invalid stream resolution"
         resp = requests.post("http://"+self.ip+"/api/services/avstreaming/enable", json={})
         print(resp.json())
         json = {

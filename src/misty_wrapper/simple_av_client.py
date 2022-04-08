@@ -89,4 +89,5 @@ class AudioPlayer:
 
 
 if __name__ == "__main__":
-    AudioPlayer("rtsp://192.168.50.156:1935").start()
+    # AudioPlayer("rtsp://192.168.50.156:193").start()
+    VidStreamer("rtsp://192.168.50.50:1936").start()

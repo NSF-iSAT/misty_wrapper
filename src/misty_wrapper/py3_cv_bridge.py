@@ -7,8 +7,9 @@
 import sys
 import numpy as np
 from sensor_msgs.msg import Image
+import rospy
 
-def imgmsg_to_cv2(img_msg):
+def imgmsg_to_cv2(img_msg, encoding=None):
     if img_msg.encoding != "bgr8":
         rospy.logerr("This Coral detect node has been hardcoded to the 'bgr8' encoding.  Come change the code if you're actually trying to implement a new camera")
     dtype = np.dtype("uint8") # Hardcode to 8 bits...
@@ -20,7 +21,7 @@ def imgmsg_to_cv2(img_msg):
         image_opencv = image_opencv.byteswap().newbyteorder()
     return image_opencv
 
-def cv2_to_imgmsg(cv_image):
+def cv2_to_imgmsg(cv_image, encoding=None):
     img_msg = Image()
     img_msg.height = cv_image.shape[0]
     img_msg.width = cv_image.shape[1]
