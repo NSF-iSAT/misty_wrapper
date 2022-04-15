@@ -8,7 +8,7 @@ from misty_wrapper.mistyPy import Robot
 # from mistyPy import Robot
 
 from misty_wrapper.py3_cv_bridge import cv2_to_imgmsg # workaround for cv_bridge incompatibility with Python 3
-from misty_wrapper.simple_av_client import VidStreamer, AudioPlayer
+from misty_wrapper.simple_av_client import VidStreamer
 from misty_wrapper.msg import DetectedFace
 
 
