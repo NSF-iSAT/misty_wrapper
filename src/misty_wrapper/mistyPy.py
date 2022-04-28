@@ -6,6 +6,7 @@
     # 		http://www.apache.org/licenses/LICENSE-2.0
     # **********************************************************************/
 
+import base64
 import requests
 import json
 import threading
