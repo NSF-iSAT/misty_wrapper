@@ -167,6 +167,7 @@ catkin_install_python(PROGRAMS
   scripts/misty_AV.py
   scripts/misty_find_ip_ros.py
   scripts/demo.py
+  scripts/google_tts.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

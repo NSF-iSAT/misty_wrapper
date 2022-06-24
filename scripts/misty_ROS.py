@@ -44,10 +44,9 @@ class MistyNode:
         right_arm_msg = msg.rightArm
 
         self.robot.MoveArms(left_arm_msg.value, right_arm_msg.value,  left_arm_msg.velocity, right_arm_msg.velocity, 
-            units=msg.units)
+            units="position")
 
     def head_cb(self, msg):
         self.robot.MoveHead( roll=msg.roll, pitch=msg.pitch, yaw=msg.yaw, velocity=msg.velocity, units=msg.units, duration=msg.duration)
-
 
 MistyNode()
