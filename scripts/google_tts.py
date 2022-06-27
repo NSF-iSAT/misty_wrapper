@@ -34,7 +34,7 @@ class MistyGoogleTTS:
 
     def tts_callback(self, msg):
 
-        text = "<speak><prosody pitch=\"+3st\">{}</prosody></speak>".format(msg.data)
+        text = "<speak><prosody pitch=\"+2st\">{}</prosody></speak>".format(msg.data)
         text_input = tts.SynthesisInput(ssml=text)
         response = self.client.synthesize_speech(input=text_input, voice=self.voice_params, audio_config=self.audio_config)
         with open("tts.mp3", "wb") as out:

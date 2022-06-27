@@ -35,7 +35,9 @@
         </node> -->
     </group>
 
-    <node pkg="misty_wrapper" type="google_tts.py" name="misty_tts"/>
+    <node pkg="misty_wrapper" type="google_tts.py" name="misty_tts">
+        <remap from="/text_to_speech" to="/misty/id_$(arg robot_id)/speech"/>
+    </node>
 
     <group if="$(arg demo_mode)">
         <node pkg="misty_wrapper" type="demo.py" name="misty_demo_$(arg robot_id)"/>

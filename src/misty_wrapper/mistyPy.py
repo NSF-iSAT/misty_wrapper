@@ -89,13 +89,13 @@ class Robot:
         requests.post('http://'+self.ip+'/api/head',json=json)
 
     def moveHeadPosition(self, pitch, roll, yaw, velocity):
-        self.moveHead(pitch, roll, yaw, velocity, "position")
+        self.MoveHead(pitch, roll, yaw, velocity, "position")
     
     def moveHeadRadians(self, pitch, roll, yaw, velocity):
-        self.moveHead(pitch, roll, yaw, velocity, "radians")
+        self.MoveHead(pitch, roll, yaw, velocity, "radians")
     
     def moveHeadDegrees(self, pitch, roll, yaw, velocity):
-        self.moveHead(pitch, roll, yaw, velocity, "degrees")
+        self.MoveHead(pitch, roll, yaw, velocity, "degrees")
 
     def drive(self,linear_velocity, angular_velocity):
         assert -100 <= linear_velocity <= 100 and -100 <= angular_velocity <= 100, " drive: The velocities needs to be in the range -100 to 100"
