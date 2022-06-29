@@ -8,11 +8,11 @@ from misty_wrapper.mistyPy import Robot
 
 class MistyGoogleTTS:
     def __init__(self, idx=0):
-        # self.ip = ""
-        # while not self.ip:
-        #     self.ip = rospy.get_param("/misty/id_" + str(idx) + "/robot_ip")
-        #     rospy.sleep(1.0)
-        self.ip = "192.168.50.50"
+        self.ip = ""
+        while not self.ip:
+            self.ip = rospy.get_param("/misty/id_" + str(idx) + "/robot_ip")
+            rospy.sleep(1.0)
+        # self.ip = "192.168.50.50"
 
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/home/kaleb/code/ros_ws/src/ros_speech2text/ros-speech2text-google-stt-cred.json'
 
