@@ -10,6 +10,7 @@
     <arg name="use_av_stream" default="true"/>
     <arg name="demo_mode" default="false"/>
     <arg name="use_tts" default="true"/>
+    <!-- <arg name="google_auth_path" defa -->
     
     <param name="/misty/id_$(arg robot_id)/robot_ip" type="string" value="$(arg robot_ip)"/>
 
@@ -19,7 +20,7 @@
         </node>
     </group>
 
-    <node pkg="misty_wrapper" type="misty_ROS.py" name="misty_ROS_$(arg robot_id)">
+    <node pkg="misty_wrapper" type="misty_ROS.py" name="misty_ROS_$(arg robot_id)" output="screen">
         <param name="use_robot" type="bool" value="$(arg use_robot)" />
     </node>
 
@@ -37,9 +38,9 @@
     </group>
 
     <group if="$(arg use_tts)">
-        <node pkg="misty_wrapper" type="google_tts.py" name="misty_tts">
-            <remap from="/text_to_speech" to="/misty/id_$(arg robot_id)/gcloud_speech"/>
-        </node>
+        <include file="$(find google_tts)/launch/google_tts.launch">
+            <!-- <arg name="google_auth_path" value="$(arg google_auth_path)"/> -->
+        </include>
     </group>
 
     <group if="$(arg demo_mode)">

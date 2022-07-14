@@ -4,6 +4,7 @@ from misty_wrapper.mistyPy import Robot
 
 from std_msgs.msg import String, Int8MultiArray
 from misty_wrapper.msg import MoveArms, MoveHead
+from google_tts.srv import Speech
 
 # movement limits, in degrees
 PITCH_UP = -35
@@ -20,6 +21,7 @@ class MistyNode:
 
     def __init__(self, idx=0, ip=None):
         self.ip = ip
+        self.use_google_tts = True
         if rospy.get_param("/misty_ROS_"+ str(idx) + "/use_robot") == True:
             if ip is None:
                 while not self.ip:
@@ -35,7 +37,7 @@ class MistyNode:
         self.led_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/led", Int8MultiArray, self.led_cb )
         self.action_sub = rospy.Subscriber("/misty/id_" + str(idx) + "/action", String, self.action_cb)
 
-        # reset degreess
+        # reset degrees
         self.robot.MoveHead(0, 0, 0, 90, "degrees")
         
         self.head_pos = {
@@ -44,8 +46,28 @@ class MistyNode:
             "yaw"   : 0
         }
 
-        rospy.init_node("misty_" + str(idx), anonymous=False)
-        rospy.spin()
+        self.speech_queue = []
+
+        rospy.init_node("misty_" + str(idx), anonymous=True)
+        if self.use_google_tts:
+            self.speech_start = rospy.Time.now()
+            self.speech_duration = rospy.Duration(0.0)
+            rospy.wait_for_service("/google_tts")
+            self.tts_proxy = rospy.ServiceProxy("/google_tts", Speech)
+
+            while not rospy.is_shutdown():
+                print(self.speech_queue)
+                if self.speech_queue and (rospy.Time.now() - self.speech_start > self.speech_duration):
+                    self.send_tts_request(self.speech_queue.pop())
+                rospy.sleep(0.1)
+        else:
+            rospy.spin()
+
+    def send_tts_request(self, text):
+        res = self.tts_proxy(text)
+        self.speech_duration = rospy.Duration(res.duration)
+        self.robot.uploadAudio(res.filename, overwrite=True, apply=True)
+        self.speech_start = rospy.Time.now()
 
     def led_cb(self, msg):
         r, g, b = msg.data
@@ -55,7 +77,10 @@ class MistyNode:
         self.robot.DisplayImage(msg.data)
 
     def speech_cb(self, msg):
-        self.robot.Speak(msg.data)
+        if self.use_google_tts:
+            self.speech_queue.append(msg.data)
+        else:
+            self.robot.Speak(msg.data)
 
     def arms_cb(self, msg):
         left_arm_msg = msg.leftArm
