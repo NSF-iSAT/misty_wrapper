@@ -56,7 +56,7 @@ class MistyNode:
             self.tts_proxy = rospy.ServiceProxy("/google_tts", Speech)
 
             while not rospy.is_shutdown():
-                print(self.speech_queue)
+                # print(self.speech_queue)
                 if self.speech_queue and (rospy.Time.now() - self.speech_start > self.speech_duration):
                     self.send_tts_request(self.speech_queue.pop())
                 rospy.sleep(0.1)
@@ -142,7 +142,7 @@ class MistyNode:
 
     def unsure(self):
         self.tilt_head("left")
-        self.robot.DisplayImage("e_ApprehensionConcern.jpg")
+        self.robot.DisplayImage("e_ApprehensionConcerned.jpg")
         self.robot.MoveArms(10, 10, 80, 80, "position")
         rospy.sleep(1.5)
 
