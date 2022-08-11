@@ -56,7 +56,7 @@ class MistyNode:
             self.tts_proxy = rospy.ServiceProxy("/google_tts", Speech)
 
             while not rospy.is_shutdown():
-                print(self.speech_queue)
+                # print(self.speech_queue)
                 if self.speech_queue and (rospy.Time.now() - self.speech_start > self.speech_duration):
                     self.send_tts_request(self.speech_queue.pop())
                 rospy.sleep(0.1)
