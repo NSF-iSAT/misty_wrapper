@@ -142,7 +142,7 @@ class MistyNode:
 
     def unsure(self):
         self.tilt_head("left")
-        self.robot.DisplayImage("e_ApprehensionConcern.jpg")
+        self.robot.DisplayImage("e_ApprehensionConcerned.jpg")
         self.robot.MoveArms(10, 10, 80, 80, "position")
         rospy.sleep(1.5)
 
