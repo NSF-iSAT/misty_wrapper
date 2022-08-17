@@ -10,7 +10,7 @@
     <arg name="use_av_stream" default="true"/>
     <arg name="demo_mode" default="false"/>
     <arg name="use_tts" default="true"/>
-    <!-- <arg name="google_auth_path" defa -->
+    <arg name="google_auth_path" default="$(find ros_speech2text)/ros-speech2text-google-stt-cred.json"/>
     
     <param name="/misty/id_$(arg robot_id)/robot_ip" type="string" value="$(arg robot_ip)"/>
 
@@ -39,7 +39,7 @@
 
     <group if="$(arg use_tts)">
         <include file="$(find google_tts)/launch/google_tts.launch">
-            <!-- <arg name="google_auth_path" value="$(arg google_auth_path)"/> -->
+            <arg name="google_auth_path" value="$(arg google_auth_path)"/>
         </include>
     </group>
 
