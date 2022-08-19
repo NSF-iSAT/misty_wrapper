@@ -21,7 +21,7 @@ class MistyNode:
 
     def __init__(self, idx=0, ip=None):
         self.ip = ip
-        self.use_google_tts = True
+        self.use_google_tts = rospy.get_param("~use_google_tts")
         if rospy.get_param("/misty_ROS_"+ str(idx) + "/use_robot") == True:
             if ip is None:
                 while not self.ip:
@@ -54,7 +54,8 @@ class MistyNode:
             self.speech_duration = rospy.Duration(0.0)
             rospy.wait_for_service("/google_tts")
             self.tts_proxy = rospy.ServiceProxy("/google_tts", Speech)
-
+            self.send_tts_request("Hi there! I'm using Google text-to-speech.")
+            rospy.sleep(5.0)
             while not rospy.is_shutdown():
                 # print(self.speech_queue)
                 if self.speech_queue and (rospy.Time.now() - self.speech_start > self.speech_duration):
