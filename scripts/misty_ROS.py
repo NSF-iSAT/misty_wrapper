@@ -111,6 +111,12 @@ class MistyNode:
             self.laugh()
         elif msg.data == "surprise":
             self.surprise()
+        elif msg.data == "waggle":
+            self.arm_waggle()
+        elif msg.data == "tilt":
+            self.head_tilt()
+        elif msg.data == "look":
+            self.look_left()
 
     def reset_head_pos(self):
         # resets Misty's head to match stored values -
@@ -121,7 +127,7 @@ class MistyNode:
     # # # action macros # # #
 
     def nod(self):
-        new_pitch = self.pitch + 15
+        new_pitch = self.head_pos["pitch"] + 15
         if new_pitch > PITCH_DOWN:
             new_pitch -= 30
 
@@ -185,6 +191,28 @@ class MistyNode:
         self.tilt_head("straight")
         self.robot.MoveArms(0, 0, 80, 80, "position")
         self.robot.DisplayImage("e_DefaultContent.jpg")
+
+    def arm_waggle(self):
+        self.robot.MoveArms(10, 0, 100, 100, "position")
+        rospy.sleep(0.5)
+        self.robot.MoveArms(0, 10, 100, 100, "position")
+        rospy.sleep(0.5)
+        self.robot.MoveArms(5, 5, 90, 90, "position")
+
+    def head_tilt(self):
+        self.tilt_head("left")
+        self.robot.DisplayImage("e_Joy.jpg")
+        rospy.sleep(1.5)
+        self.tilt_head("straight")
+        self.robot.DisplayImage("e_DefaultContent.jpg")
+
+    def look_left(self):
+        self.robot.MoveHead(self.head_pos["roll"], 
+            self.head_pos["pitch"], YAW_RIGHT, 95, "degrees")
+
+        rospy.sleep(2.0)
+        self.robot.MoveHead(self.head_pos["roll"], 
+            self.head_pos["pitch"], self.head_pos["yaw"], 95, "degrees")
 
 if __name__ == "__main__":
     MistyNode()
