@@ -12,6 +12,7 @@
     <arg name="use_tts" default="true"/>
     <arg name="google_auth_path" default="$(find ros_speech2text)/ros-speech2text-google-stt-cred.json"/>
     
+
     <param name="/misty/id_$(arg robot_id)/robot_ip" type="string" value="$(arg robot_ip)"/>
 
     <group unless="$(arg robot_ip_is_set)">
